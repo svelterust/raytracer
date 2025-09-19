@@ -26,13 +26,22 @@ vec3_unit :: proc(v: vec3) -> vec3 {
 	return v / vec3_length(v)
 }
 
+Ray :: struct {
+	orig: vec3,
+	dir:  vec3,
+}
+
+ray_at :: proc(ray: Ray, t: f32) -> vec3 {
+	return ray.orig + ray.dir * t
+}
+
 Image :: struct {
 	width:  int,
 	height: int,
 	pixels: [][3]byte,
 }
 
-image_create :: proc(width: int, height: int) -> Image {
+image_create :: proc(width, height: int) -> Image {
 	return {width, height, make([][3]byte, width * height)}
 }
 
