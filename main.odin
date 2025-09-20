@@ -31,12 +31,12 @@ Ray :: struct {
 	dir:  vec3,
 }
 
-ray_at :: proc(ray: Ray, t: f64) -> vec3 {
-	return ray.orig + ray.dir * t
+ray_at :: proc(r: Ray, t: f64) -> vec3 {
+	return r.orig + r.dir * t
 }
 
-ray_color :: proc(ray: Ray) -> vec3 {
-	unit_direction := vec3_unit(ray.dir)
+ray_color :: proc(r: Ray) -> vec3 {
+	unit_direction := vec3_unit(r.dir)
 	a := 0.5 * (unit_direction.y + 1.0)
 	return (1.0 - a) * vec3{1.0, 1.0, 1.0} + a * vec3{0.5, 0.7, 1.0}
 }
@@ -64,7 +64,6 @@ image_save :: proc(image: ^Image) {
 	}
 	fmt.printf("")
 }
-
 
 main :: proc() {
 	// Calculate image size
