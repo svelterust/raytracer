@@ -6,8 +6,12 @@ import math "core:math"
 vec3 :: [3]f64
 
 vec3_length :: proc(v: vec3) -> f64 {
-	squared := v * v
-	return math.sqrt(squared.x + squared.y + squared.z)
+	return math.sqrt(vec3_length_squared(v))
+}
+
+vec3_length_squared :: proc(v: vec3) -> f64 {
+	product := v * v
+	return product.x + product.y + product.z
 }
 
 vec3_dot :: proc(u, v: vec3) -> f64 {
@@ -35,17 +39,26 @@ ray_at :: proc(r: Ray, t: f64) -> vec3 {
 	return r.orig + r.dir * t
 }
 
-ray_hit_sphere :: proc(center: vec3, radius: f64, r: Ray) -> bool {
+ray_hit_sphere :: proc(center: vec3, radius: f64, r: Ray) -> f64 {
 	oc := center - r.orig
-	a := vec3_dot(r.dir, r.dir)
-	b := -2 * vec3_dot(r.dir, oc)
-	c := vec3_dot(oc, oc) - radius * radius
-	discriminant := b * b - 4 * a * c
-	return discriminant >= 0
+	a := vec3_length_squared(r.dir)
+	h := vec3_dot(r.dir, oc)
+	c := vec3_length_squared(oc) - radius * radius
+	discriminant := h * h - a * c
+
+	if discriminant < 0 {
+		return -1
+	} else {
+		return (h - math.sqrt(discriminant)) / a
+	}
 }
 
 ray_color :: proc(r: Ray) -> vec3 {
-	if (ray_hit_sphere(vec3{0, 0, -1}, 0.5, r)) {return vec3{1, 0, 0}}
+	t := ray_hit_sphere(vec3{0, 0, -1}, 0.5, r)
+	if (t > 0) {
+		N := vec3_unit(ray_at(r, t) - vec3{0, 0, -1})
+		return 0.5 * vec3{N.x + 1, N.y + 1, N.z + 1}
+	}
 	unit_direction := vec3_unit(r.dir)
 	a := 0.5 * (unit_direction.y + 1.0)
 	return (1.0 - a) * vec3{1.0, 1.0, 1.0} + a * vec3{0.5, 0.7, 1.0}
