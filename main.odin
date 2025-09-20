@@ -35,11 +35,22 @@ ray_at :: proc(r: Ray, t: f64) -> vec3 {
 	return r.orig + r.dir * t
 }
 
+ray_hit_sphere :: proc(center: vec3, radius: f64, r: Ray) -> bool {
+	oc := center - r.orig
+	a := vec3_dot(r.dir, r.dir)
+	b := -2 * vec3_dot(r.dir, oc)
+	c := vec3_dot(oc, oc) - radius * radius
+	discriminant := b * b - 4 * a * c
+	return discriminant >= 0
+}
+
 ray_color :: proc(r: Ray) -> vec3 {
+	if (ray_hit_sphere(vec3{0, 0, -1}, 0.5, r)) {return vec3{1, 0, 0}}
 	unit_direction := vec3_unit(r.dir)
 	a := 0.5 * (unit_direction.y + 1.0)
 	return (1.0 - a) * vec3{1.0, 1.0, 1.0} + a * vec3{0.5, 0.7, 1.0}
 }
+
 
 Image :: struct {
 	width:  int,
